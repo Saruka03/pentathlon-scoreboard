@@ -1,0 +1,258 @@
+/* FULL LOGO BACKGROUND */
+.round1-bg {
+  min-height: 100vh;
+  background: url("/logo.png") center/cover no-repeat;
+  padding: 120px 0 100px;
+
+  /* ✅ THIS ENABLES SCROLL */
+  overflow-y: visible;
+}
+
+/* BIG HEADING */
+.knockout-title {
+  font-size: 64px;
+  font-weight: 900;
+  text-align: center;
+  color: white;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+
+/* GLASS CARD */
+.round1-card {
+  width: 92%;
+  max-width: 1400px;
+  margin: auto;
+  padding: 40px;
+  border-radius: 26px;
+
+  background: rgba(10, 18, 40, 0.75);
+  backdrop-filter: blur(18px);
+  color: white;
+
+  height: auto;
+  overflow: visible;
+}
+
+/* HEADINGS */
+.round1-card h2 {
+  margin-bottom: 25px;
+}
+
+/* TABLE */
+.round-table {
+  margin-top: 30px;
+}
+
+/* Header + rows must share SAME grid */
+.round-header,
+.round-row {
+  /* 🔥 EQUAL COLUMNS */
+  align-items: center;
+  text-align: center;
+  gap: 0; /* ensure no random gaps */
+  padding: 12px 0;
+}
+
+/* Header styling */
+.round-header {
+  font-weight: 700;
+  border-bottom: 2px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.round-row {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+/* Team name left aligned */
+.team-name {
+  text-align: left;
+  padding-left: 10px;
+  font-weight: 600;
+}
+
+
+/* CIRCLES */
+.circle-group {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+.circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #555;
+  cursor: pointer;
+}
+
+.circle.active {
+  background-color: #555;
+}
+
+/* Total column */
+.total {
+  font-weight: 700;
+}
+
+/* BUTTON */
+.finish-btn {
+  padding: 12px 28px;
+  border-radius: 14px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+  display: inline-block;
+  margin: 30px 0 20px 0; /* left aligned */
+}
+
+.finish-btn:disabled {
+  background: gray;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+
+/* ROUND 2 */
+.section-gap {
+  margin-top: 120px;
+}
+
+.round2-table {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.round2-row {
+  display: grid;
+  grid-template-columns: 180px 1fr 140px;
+  align-items: center;
+  gap: 0;
+}
+
+.round2-row input {
+  width: 140px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  color: white;
+  font-size: 14px;
+}
+
+/* Remove increment/decrement arrows from number input */
+.round2-row input::-webkit-outer-spin-button,
+.round2-row input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.round2-row input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* ================================
+   FIX KNOCK OUT ROUND 2 HEADER
+   ================================ */
+
+/* Remove underline ONLY for Round 2 header */
+.round2-table .round-header {
+  border-bottom: none;
+}
+
+/* Align "Team" to the left in Round 2 */
+.round2-table .round-header span:first-child {
+  justify-self: start;
+  text-align: left;
+  padding-left: 6px;
+}
+
+/* Keep "Score" centered */
+.round2-table .round-header span:last-child {
+  justify-self: center;
+}
+
+.centered span {
+  text-align: center;
+}
+
+.team-name {
+  justify-self: start;
+}
+
+.left-actions {
+  display: flex;
+  justify-content: flex-start; /* FORCE LEFT */
+  width: 100%;
+}
+
+.finish-btn {
+  margin: 16px 0;
+}
+
+.left-actions {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start; /* LEFT */
+}
+
+.finish-btn {
+  margin: 18px 0;
+  align-self: flex-start;
+}
+
+/* Locked look */
+.finish-btn:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.score-grid {
+  display: grid;
+  grid-template-columns:
+    160px   /* Team */
+    180px   /* Maths */
+    180px   /* Science */
+    140px   /* IT */
+    140px   /* GK */
+    180px   /* Sports */
+    100px;  /* Total */
+
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.score-grid.header {
+  font-weight: 700;
+  opacity: 0.95;
+  margin-bottom: 22px;
+}
+
+/* Cells */
+.cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* Team column */
+.cell.team {
+  justify-content: flex-start;
+  padding-left: 6px;
+}
+
+/* Total column */
+.cell.total {
+  font-weight: 700;
+}
+

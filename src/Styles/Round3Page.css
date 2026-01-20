@@ -1,0 +1,400 @@
+/* ===============================
+   ROUND 3 TITLES
+   =============================== */
+.round3-title {
+  text-align: center;
+  margin: 50px 0 30px;
+  font-size: 1.6rem;
+  letter-spacing: 2px;
+}
+
+/* ===============================
+   ROUND 1 & 2 TABLE (2 COLUMNS)
+   =============================== */
+.final-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.final-table h4 {
+  margin-bottom: 12px;
+}
+
+/* Score input */
+.final-table input {
+  width: 100px;
+  padding: 8px;
+  border-radius: 10px;
+  border: none;
+  text-align: center;
+  font-size: 1rem;
+}
+
+/* Main page title */
+.final-round-title {
+  font-size: 2.6rem;
+  font-weight: 800;
+  letter-spacing: 3px;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+/* Round headings (Round 1, 2, 3) */
+.round-title {
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin: 50px 0 25px;
+  text-align: center;
+}
+
+
+/* ===============================
+   BUZZER ROUND TABLE
+   =============================== */
+.buzzer-table {
+  display: grid;
+  grid-template-columns: 1.5fr 2fr 1.5fr 2fr;
+  align-items: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+/* Member select */
+.buzzer-table select {
+  padding: 8px;
+  border-radius: 10px;
+  border: none;
+}
+
+/* Circles */
+.buzzer-circles {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.buzzer-circle {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid white;
+  cursor: pointer;
+}
+
+/* States */
+.buzzer-circle.green {
+  background: #22c55e;
+  border-color: #22c55e;
+}
+
+.buzzer-circle.red {
+  background: #ef4444;
+  border-color: #ef4444;
+}
+
+/* ===============================
+   FINAL SCORE DISPLAY
+   =============================== */
+.final-score {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+/* Reuse existing finish button */
+.finish-btn.center {
+  display: block;
+  margin: 30px auto 0;
+}
+
+.center {
+  text-align: center;
+}
+
+.space-top {
+  margin-top: 40px;
+}
+
+
+.score-center {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  margin-bottom: 15px;
+}
+
+.score-center input {
+  width: 80px;
+  text-align: center;
+}
+
+.finish-btn {
+  display: block;
+  margin: 15px auto 30px;
+  padding: 10px 25px;
+  border-radius: 20px;
+}
+
+.buzzer-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.buzzer-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  cursor: pointer;
+}
+
+.buzzer-circle.green {
+  background: #22c55e;
+}
+
+.buzzer-circle.red {
+  background: #ef4444;
+}
+.round-title {
+  margin: 50px 0 25px;
+  text-align: center;
+  font-size: 1.4rem;
+}
+.round-title {
+  margin: 50px 0 25px;
+  text-align: center;
+  font-size: 1.4rem;
+}
+.score-center input {
+  width: 120px;
+  height: 50px;
+  font-size: 1.2rem;
+  border-radius: 14px;
+}
+.buzzer-grid {
+  gap: 22px;
+  margin-top: 30px;
+}
+
+.buzzer-circle {
+  width: 22px;
+  height: 22px;
+  border-width: 2px;
+}
+.circle-row {
+  display: flex;
+  gap: 10px;
+}
+.score-center {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  margin-bottom: 20px;
+}
+
+/* Team name above input */
+.score-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px; /* space between name and box */
+}
+.score-row {
+  display: flex;
+  justify-content: center;
+  gap: 120px;
+  margin-bottom: 25px;
+}
+.team-score-col {
+  display: flex;
+  flex-direction: column;   /* 🔴 THIS IS THE KEY */
+  align-items: center;
+}
+.team-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.team-name {
+  color: white;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-align: center;
+}
+/* Bigger score input */
+.score-box input {
+  width: 120px;
+  height: 52px;
+  font-size: 1.3rem;
+  text-align: center;
+  border-radius: 16px;
+}
+.glass-score {
+  width: 120px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  color: white;
+  text-align: center;
+  font-size: 16px;
+  outline: none;
+}
+.buzzer-row select {
+  padding: 10px 18px;
+  border-radius: 999px; /* oval shape */
+  border: none;
+  font-size: 0.95rem;
+  background: white;
+  min-width: 220px;
+  text-align: center;
+}
+.buzzer-row select:hover {
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.6);
+}
+/* ===============================
+   GLASS SELECT (BUZZER ROUND)
+   =============================== */
+.buzzer-row select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  width: 230px;
+  padding: 12px 50px 12px 20px;
+  border-radius: 999px;
+
+  font-size: 0.95rem;
+  color: white;
+
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Hover / focus glow */
+.buzzer-row select:hover,
+.buzzer-row select:focus {
+  outline: none;
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.5);
+}
+
+/* Dropdown arrow */
+.buzzer-row select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M7 10l5 5 5-5'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 18px center;
+  background-size: 18px;
+}
+/* Dropdown list */
+.buzzer-row select option {
+  background: #0f172a; /* dark blue */
+  color: white;
+  padding: 12px;
+}
+
+/* Selected / hover highlight */
+.buzzer-row select option:checked,
+.buzzer-row select option:hover {
+  background: #93c5fd;
+  color: #020617;
+}
+.finish-btn.disabled {
+  background: #6b7280;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+.round-finish-btn {
+  margin: 10px auto 30px;
+  display: block;
+  padding: 10px 28px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: #000;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.round-finish-btn.finished {
+  background: #999;
+  color: #222;
+  cursor: not-allowed;
+}
+/* Remove number input arrows */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+.glass-select {
+  width: 260px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  outline: none;
+}
+
+.glass-select option {
+  color: black;
+}
+
+.buzzer-container {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+}
+
+/* Team wrapper */
+.buzzer-team {
+  display: flex;
+  justify-content: center;
+}
+
+/* Column that defines alignment */
+.member-column {
+  width: 260px;          /* SAME as select */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Team name PERFECTLY centered */
+.buzzer-team-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+/* Row layout */
+.buzzer-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}

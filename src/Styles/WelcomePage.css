@@ -1,0 +1,50 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+.welcome-container {
+  min-height: 100vh;
+  padding-top: 72px; /* 🔥 same as navbar height */
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  background-image:
+    linear-gradient(rgba(10, 15, 44, 0.65), rgba(10, 15, 44, 0.65)),
+    url("/logo.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.main-title {
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-weight: 700;
+  letter-spacing: 6px;
+  color: white;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+
+  text-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+}
+
+.start-btn {
+  padding: 14px 60px;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  border: none;
+  border-radius: 30px;
+  background: #1e3a8a;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.start-btn:hover {
+  background: #2563eb;
+  transform: scale(1.08);
+}

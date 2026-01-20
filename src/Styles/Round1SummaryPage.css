@@ -1,0 +1,57 @@
+/* ===============================
+   SCOREBOARD – EXTRA SPACING
+   =============================== */
+
+.score-title {
+  text-align: center;
+  letter-spacing: 4px;
+  margin-bottom: 40px;
+  color: white;
+}
+
+.score-list {
+  display: flex;
+  flex-direction: column;
+  gap: 28px; /* 🔥 more vertical spacing */
+}
+
+.score-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 70px; /* 🔥 more horizontal spacing */
+  align-items: center;
+}
+
+/* Rank circle */
+.rank-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  justify-self: start;
+}
+
+/* Rank colors */
+.rank-1 { background: red; color: white; }
+.rank-2 { background: orange; color: white; }
+.rank-3 { background: gold; color: black; }
+.rank-4 { background: white; color: black; }
+.rank-5 { background: white; color: black; }
+
+/* Team name centered with breathing space */
+.team-name {
+  text-align: center;
+  font-size: 1.05rem;
+  letter-spacing: 1px;
+  color: white;
+}
+
+/* Score aligned right */
+.team-score {
+  text-align: right;
+  font-weight: bold;
+  font-size: 1.05rem;
+  color: white;
+}
