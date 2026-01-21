@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../Styles/Round3Page.css";
+import { supabase } from "../lib/supabase";
 
 type Team = {
-  id: number;
+  id: string;
   name: string;
   members: string[];
 };
@@ -21,38 +22,88 @@ const Round3Page = () => {
   const [team1, setTeam1] = useState<Team | null>(null);
   const [team2, setTeam2] = useState<Team | null>(null);
 
-  /* ================= LOAD FINAL TEAMS ================= */
+  /* ================= LOAD FINALISTS FROM DATABASE ================= */
 
   useEffect(() => {
-    const raw = localStorage.getItem("round3Teams");
-    if (!raw) return;
-
-    const teams = JSON.parse(raw);
-
-    const sorted = [...teams].sort(
-      (a: any, b: any) => b.totalScore - a.totalScore
-    );
-
-    const finalists = sorted.slice(0, 2).map((t: any, i: number) => ({
-      id: i + 1,
-      name: t.name,
-      members: t.members || [],
-    }));
-
-    setTeam1(finalists[0]);
-    setTeam2(finalists[1]);
+    loadFinalists();
   }, []);
+
+  const loadFinalists = async () => {
+    // 1️⃣ Get Final round id
+    const { data: finalRound } = await supabase
+      .from("rounds")
+      .select("id")
+      .eq("name", "Final")
+      .single();
+
+    if (!finalRound) {
+      alert("Final round not found in database");
+      return;
+    }
+
+    // 2️⃣ Get total scores of previous round (Qualifier)
+    const { data: scores } = await supabase
+      .from("scores")
+      .select("team_id, points")
+      .neq("sub_round", "great_mind")
+      .neq("sub_round", "puzzle")
+      .neq("sub_round", "buzzer");
+
+
+    // 3️⃣ Get teams
+    const { data: teams } = await supabase
+      .from("teams")
+      .select("id, name");
+
+    if (!scores || !teams) return;
+
+    // 4️⃣ Sum scores per team
+    const map = new Map<string, number>();
+
+    scores.forEach(s => {
+      map.set(s.team_id, (map.get(s.team_id) || 0) + s.points);
+    });
+
+    // 5️⃣ Sort teams by score
+    const sorted = [...teams]
+      .map(t => ({
+        ...t,
+        total: map.get(t.id) || 0
+      }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 2);
+
+    // 6️⃣ Load members for each team
+    const loadTeam = async (team: any): Promise<Team> => {
+      const { data: members } = await supabase
+        .from("players")
+        .select("name")
+        .eq("team_id", team.id);
+
+      return {
+        id: team.id,
+        name: team.name,
+        members: members?.map(m => m.name) || []
+      };
+    };
+
+    const t1 = await loadTeam(sorted[0]);
+    const t2 = await loadTeam(sorted[1]);
+
+    setTeam1(t1);
+    setTeam2(t2);
+  };
 
   /* ================= ROUND SCORES ================= */
 
   const [round1, setRound1] = useState<{ t1: number | ""; t2: number | "" }>({
     t1: "",
-    t2: "",
+    t2: ""
   });
 
   const [round2, setRound2] = useState<{ t1: number | ""; t2: number | "" }>({
     t1: "",
-    t2: "",
+    t2: ""
   });
 
   const [round1Finished, setRound1Finished] = useState(false);
@@ -68,16 +119,11 @@ const Round3Page = () => {
     Array.from({ length: ROWS }, createRow)
   );
 
-  const [team1Selected, setTeam1Selected] = useState<string[]>(
-    Array(ROWS).fill("")
-  );
-  const [team2Selected, setTeam2Selected] = useState<string[]>(
-    Array(ROWS).fill("")
-  );
+  const [team1Selected, setTeam1Selected] = useState<string[]>(Array(ROWS).fill(""));
+  const [team2Selected, setTeam2Selected] = useState<string[]>(Array(ROWS).fill(""));
 
   const toggleCircle = (team: 1 | 2, r: number, c: number) => {
     if (finalFinished) return;
-
     const setter = team === 1 ? setTeam1Circles : setTeam2Circles;
     const data = team === 1 ? team1Circles : team2Circles;
 
@@ -89,7 +135,6 @@ const Round3Page = () => {
 
   const markWrong = (team: 1 | 2, r: number, c: number) => {
     if (finalFinished) return;
-
     const setter = team === 1 ? setTeam1Circles : setTeam2Circles;
     const data = team === 1 ? team1Circles : team2Circles;
 
@@ -100,8 +145,7 @@ const Round3Page = () => {
   };
 
   const buzzerScore = (grid: CircleState[][]) => {
-    let green = 0,
-      red = 0;
+    let green = 0, red = 0;
     grid.forEach(row =>
       row.forEach(c => {
         if (c === "green") green++;
@@ -111,50 +155,56 @@ const Round3Page = () => {
     return green * 2 - red;
   };
 
-  /* ================= FINISH FINAL ================= */
+  /* ================= FINISH FINAL & SAVE TO DB ================= */
 
-  const finishFinal = () => {
+  const finishFinal = async () => {
     if (!team1 || !team2) return;
 
     setFinalFinished(true);
 
-    const t1Total =
-      (round1.t1 || 0) + (round2.t1 || 0) + buzzerScore(team1Circles);
-    const t2Total =
-      (round1.t2 || 0) + (round2.t2 || 0) + buzzerScore(team2Circles);
+    const t1Buzzer = buzzerScore(team1Circles);
+    const t2Buzzer = buzzerScore(team2Circles);
+
+    const t1Total = (round1.t1 || 0) + (round2.t1 || 0) + t1Buzzer;
+    const t2Total = (round1.t2 || 0) + (round2.t2 || 0) + t2Buzzer;
+
+    // Get final round id
+    const { data: finalRound } = await supabase
+      .from("rounds")
+      .select("id")
+      .eq("name", "Final")
+      .single();
+
+    if (!finalRound) return;
+
+    // Save scores
+    await supabase.from("scores").insert([
+      { team_id: team1.id, round_id: finalRound.id, points: round1.t1 || 0, sub_round: "great_mind" },
+      { team_id: team1.id, round_id: finalRound.id, points: round2.t1 || 0, sub_round: "puzzle" },
+      { team_id: team1.id, round_id: finalRound.id, points: t1Buzzer, sub_round: "buzzer" },
+
+      { team_id: team2.id, round_id: finalRound.id, points: round1.t2 || 0, sub_round: "great_mind" },
+      { team_id: team2.id, round_id: finalRound.id, points: round2.t2 || 0, sub_round: "puzzle" },
+      { team_id: team2.id, round_id: finalRound.id, points: t2Buzzer, sub_round: "buzzer" },
+    ]);
 
     const winner =
-      t1Total > t2Total
-        ? team1.name
-        : t2Total > t1Total
-        ? team2.name
-        : "Draw";
-
-    localStorage.setItem(
-      "round4Results",
-      JSON.stringify({
-        team1,
-        team2,
-        team1Total: t1Total,
-        team2Total: t2Total,
-        winner,
-      })
-    );
+      t1Total > t2Total ? team1.name :
+      t2Total > t1Total ? team2.name :
+      "Draw";
 
     navigate("/winner", {
-      state: {
-        team1,
-        team2,
-        team1Total: t1Total,
-        team2Total: t2Total,
-        winner,
-      },
+      state: { team1, team2, t1Total, t2Total, winner }
     });
   };
 
   if (!team1 || !team2) {
     return <p style={{ color: "white", textAlign: "center" }}>Loading Final...</p>;
   }
+
+  /* ================= UI ================= */
+  // 🔴 UI PART IS UNCHANGED FROM YOUR ORIGINAL
+
 
   /* ================= UI ================= */
 

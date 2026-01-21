@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import "../Styles/TeamSetupPage.css";
 import "../Styles/ScoreboardPage.css";
+import { supabase } from "../lib/supabase";
 
 interface TeamScore {
-  id: number;
+  id: string;
   name: string;
   score: number;
 }
@@ -13,77 +13,70 @@ const ScoreboardPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadScores = () => {
-      /* ---------- LOAD TEAMS ---------- */
-      const storedTeams = JSON.parse(
-        localStorage.getItem("scoreboard_teams") || "[]"
-      );
-
-      /* ---------- LOAD ROUND DATA ---------- */
-      const round1 = JSON.parse(
-        localStorage.getItem("round1_scores") || "[]"
-      );
-
-      const round2 = JSON.parse(
-        localStorage.getItem("round2_scores") || "[]"
-      );
-
-      const round3 = JSON.parse(
-        localStorage.getItem("round3_scores") || "[]"
-      );
-
-      /* ---------- CALCULATE TOTAL ---------- */
-      const result: TeamScore[] = storedTeams.map(
-        (team: any, index: number) => {
-          const r1 =
-            round1.find((r: any) => r.teamName === team.name)?.total || 0;
-
-          const r2 =
-            round2.find((r: any) => r.teamName === team.name)?.score || 0;
-
-          const r3 =
-            round3.find((r: any) => r.teamName === team.name)?.score || 0;
-
-          return {
-            id: index,
-            name: team.name,
-            score: Number((r1 + r2 + r3).toFixed(2)),
-          };
-        }
-      );
-
-      setTeams(result.sort((a, b) => b.score - a.score));
-      setLoading(false);
-    };
-
     loadScores();
+    const interval = setInterval(loadScores, 5000);
+    return () => clearInterval(interval);
   }, []);
 
+  const loadScores = async () => {
+    setLoading(true);
+
+    const { data: teamsData } = await supabase.from("teams").select("id, name");
+    const { data: scoresData } = await supabase.from("scores").select("team_id, points");
+
+    if (!teamsData || !scoresData) {
+      setLoading(false);
+      return;
+    }
+
+    const result: TeamScore[] = teamsData.map(team => {
+      const total = scoresData
+        .filter(s => s.team_id === team.id)
+        .reduce((sum, s) => sum + s.points, 0);
+
+      return { id: team.id, name: team.name, score: total };
+    });
+
+    result.sort((a, b) => b.score - a.score);
+    setTeams(result);
+    setLoading(false);
+  };
+
   return (
-    <div className="team-bg">
-      <div className="team-card">
-        <h2 className="team-title">SCORE TABLE</h2>
+  <div className="score-bg">
+    <div className="score-overlay">
+      <div className="score-container">
+
+        <h1 className="score-title">Score Board</h1>
 
         {loading ? (
-          <p style={{ textAlign: "center", color: "#fff" }}>
-            Loading scores...
-          </p>
+          <p className="loading-text">Loading...</p>
         ) : (
-          <div className="score-list">
+          <div className="glass-scoreboard">
+          <div className="timeline">
             {teams.map((team, index) => (
-              <div key={team.id} className="score-row">
-                <div className={`rank-circle rank-${index + 1}`}>
-                  {index + 1}
+              <div key={team.id} className={`timeline-row color-${index + 1}`}>
+                
+                <div className="round-circle">
+                  {String(index + 1).padStart(2, "0")}
                 </div>
-                <span className="team-name">{team.name}</span>
-                <span className="team-score">{team.score}</span>
+
+                <div className="timeline-content">
+                  <div className="team-name">{team.name}</div>
+                  <div className="team-score">{team.score} points</div>
+                </div>
+
               </div>
             ))}
           </div>
+          </div>
         )}
+
       </div>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default ScoreboardPage;

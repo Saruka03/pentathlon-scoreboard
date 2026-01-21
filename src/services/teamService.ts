@@ -13,7 +13,7 @@ export const addTeamMember = async (
   memberName: string
 ) => {
   return await supabase
-    .from("team_members")
+    .from("players")
     .insert({
       team_id: teamId,
       member_name: memberName

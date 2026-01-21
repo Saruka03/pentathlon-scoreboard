@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../Styles/TeamSetupPage.css";
+import { supabase } from "../lib/supabase";
 
 type Team = {
   name: string;
@@ -9,13 +10,13 @@ type Team = {
 
 const TOTAL_TEAMS = 5;
 const MEMBERS_PER_TEAM = 5;
-const STORAGE_KEY = "scoreboard_teams";
 
 const TeamSetupPage = () => {
   const navigate = useNavigate();
 
   const [step, setStep] = useState<"teams" | "members">("teams");
   const [currentTeamIndex, setCurrentTeamIndex] = useState(0);
+  const [saving, setSaving] = useState(false);
 
   const [teamNames, setTeamNames] = useState<string[]>(
     Array(TOTAL_TEAMS).fill("")
@@ -53,7 +54,7 @@ const TeamSetupPage = () => {
     setMembers(updated);
   };
 
-  const saveMembersAndNext = () => {
+  const saveMembersAndNext = async () => {
     const updatedTeams = [...teams];
 
     updatedTeams[currentTeamIndex].members = members.map(
@@ -66,17 +67,53 @@ const TeamSetupPage = () => {
     if (currentTeamIndex < TOTAL_TEAMS - 1) {
       setCurrentTeamIndex(currentTeamIndex + 1);
     } else {
-      // ✅ FINAL SAVE TO LOCAL STORAGE
-      saveTeamsToLocalStorage(updatedTeams);
-      navigate("/scoreboard");
+      // ✅ FINAL SAVE TO SUPABASE
+      await saveTeamsToSupabase(updatedTeams);
     }
   };
 
-  /* ---------- LOCAL STORAGE ---------- */
+  /* ---------- SUPABASE SAVE ---------- */
 
-  const saveTeamsToLocalStorage = (finalTeams: Team[]) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(finalTeams));
-    console.log("Teams saved to localStorage:", finalTeams);
+  const saveTeamsToSupabase = async (finalTeams: Team[]) => {
+    try {
+      setSaving(true);
+
+      // Optional: clear old data
+      await supabase.from("players").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      await supabase.from("teams").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+
+      for (const team of finalTeams) {
+        // 1️⃣ Insert team
+        const { data: teamData, error: teamError } = await supabase
+          .from("teams")
+          .insert([{ name: team.name }])
+          .select()
+          .single();
+
+        if (teamError) throw teamError;
+
+        // 2️⃣ Insert members
+        const membersPayload = team.members.map((memberName) => ({
+          team_id: teamData.id,
+          name: memberName
+        }));
+
+        const { error: membersError } = await supabase
+          .from("players")
+          .insert(membersPayload);
+
+        if (membersError) throw membersError;
+      }
+
+      alert("✅ Teams saved to database successfully!");
+      navigate("/scoreboard");
+
+    } catch (err) {
+      console.error("❌ Supabase save error:", err);
+      alert("Failed to save teams. Check console.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   /* ---------- UI ---------- */
@@ -133,8 +170,10 @@ const TeamSetupPage = () => {
               ))}
             </div>
 
-            <button className="action-btn" onClick={saveMembersAndNext}>
-              {currentTeamIndex < TOTAL_TEAMS - 1
+            <button className="action-btn" onClick={saveMembersAndNext} disabled={saving}>
+              {saving
+                ? "SAVING..."
+                : currentTeamIndex < TOTAL_TEAMS - 1
                 ? "NEXT TEAM"
                 : "FINISH"}
             </button>

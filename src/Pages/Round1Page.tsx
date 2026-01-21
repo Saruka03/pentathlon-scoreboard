@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../Styles/Round1Page.css";
+import { supabase } from "../lib/supabase";
 
 type Team = {
+  id: string;
   name: string;
 };
 
@@ -25,30 +27,73 @@ const Round1Page = () => {
   const [round1Locked, setRound1Locked] = useState(false);
   const [round2Locked, setRound2Locked] = useState(false);
 
-  /* ---------- LOAD TEAMS ---------- */
   useEffect(() => {
-    const storedTeams = JSON.parse(
-      localStorage.getItem("scoreboard_teams") || "[]"
-    );
-
-    const teamList = storedTeams.map((t: any) => ({ name: t.name }));
-    setTeams(teamList);
-
-    setScores(
-      teamList.map(() =>
-        Object.fromEntries(SUBJECTS.map(s => [s.key, []]))
-      )
-    );
-
-    setRound2Scores(teamList.map(() => ""));
+    loadEverything();
   }, []);
 
-  /* ---------- ROUND 1 ---------- */
-  const toggleCircle = (
-    teamIndex: number,
-    subjectKey: string,
-    circleIndex: number
-  ) => {
+  const loadEverything = async () => {
+    await loadTeams();
+    await checkLocks();
+  };
+
+  /* ---------- LOAD TEAMS ---------- */
+  const loadTeams = async () => {
+    const { data, error } = await supabase.from("teams").select("id, name");
+
+    if (error) {
+      alert("Failed to load teams");
+      console.error(error);
+      return;
+    }
+
+    setTeams(data);
+
+    setScores(
+      data.map(() => Object.fromEntries(SUBJECTS.map(s => [s.key, []])))
+    );
+
+    setRound2Scores(data.map(() => ""));
+  };
+
+  /* ---------- ENSURE ROUND EXISTS ---------- */
+  const getOrCreateRound = async (roundName: string) => {
+    let { data } = await supabase
+      .from("rounds")
+      .select("id")
+      .eq("name", roundName)
+      .single();
+
+    if (!data) {
+      const { data: newRound } = await supabase
+        .from("rounds")
+        .insert({ name: roundName, score_type: "team" })
+        .select()
+        .single();
+
+      return newRound.id;
+    }
+
+    return data.id;
+  };
+
+  /* ---------- CHECK LOCKS ---------- */
+  const checkLocks = async () => {
+    const r1 = await supabase.from("rounds").select("id").eq("name", "Knockout 1").single();
+    const r2 = await supabase.from("rounds").select("id").eq("name", "Knockout 2").single();
+
+    if (r1.data) {
+      const { data } = await supabase.from("scores").select("id").eq("round_id", r1.data.id);
+      if (data && data.length > 0) setRound1Locked(true);
+    }
+
+    if (r2.data) {
+      const { data } = await supabase.from("scores").select("id").eq("round_id", r2.data.id);
+      if (data && data.length > 0) setRound2Locked(true);
+    }
+  };
+
+  /* ---------- UI LOGIC ---------- */
+  const toggleCircle = (teamIndex: number, subjectKey: string, circleIndex: number) => {
     if (round1Locked) return;
 
     const updated = [...scores];
@@ -69,39 +114,42 @@ const Round1Page = () => {
     return Number((sum / TOTAL_CREDIT).toFixed(2));
   };
 
-  const finishRound1 = () => {
-  const round1Data = teams.map((team, index) => ({
-    teamName: team.name,
-    total: calculateRound1Total(index),
-    subjectScores: scores[index]
-  }));
+  /* ---------- SAVE ROUND 1 ---------- */
+  const finishRound1 = async () => {
+    const roundId = await getOrCreateRound("Knockout 1");
 
-  localStorage.setItem(
-    "round1_scores",
-    JSON.stringify(round1Data)
-  );
+    // delete old
+    await supabase.from("scores").delete().eq("round_id", roundId);
 
-  localStorage.setItem("round1_locked", "true");
-  setRound1Locked(true);
-};
+    const inserts = teams.map((team, index) => ({
+      round_id: roundId,
+      team_id: team.id,
+      points: Math.round(calculateRound1Total(index) * 100)
+    }));
 
+    await supabase.from("scores").insert(inserts);
 
-  /* ---------- ROUND 2 ---------- */
-  const finishRound2 = () => {
-  const round2Data = teams.map((team, index) => ({
-    teamName: team.name,
-    score: Number(round2Scores[index] || 0)
-  }));
+    setRound1Locked(true);
+    alert("✅ Round 1 saved");
+  };
 
-  localStorage.setItem(
-    "round2_scores",
-    JSON.stringify(round2Data)
-  );
+  /* ---------- SAVE ROUND 2 ---------- */
+  const finishRound2 = async () => {
+    const roundId = await getOrCreateRound("Knockout 2");
 
-  localStorage.setItem("round2_locked", "true");
-  setRound2Locked(true);
-};
+    await supabase.from("scores").delete().eq("round_id", roundId);
 
+    const inserts = teams.map((team, index) => ({
+      round_id: roundId,
+      team_id: team.id,
+      points: Number(round2Scores[index] || 0)
+    }));
+
+    await supabase.from("scores").insert(inserts);
+
+    setRound2Locked(true);
+    alert("✅ Round 2 saved");
+  };
 
   return (
     <div className="round1-bg">
@@ -125,7 +173,7 @@ const Round1Page = () => {
 
           {/* ROWS */}
           {teams.map((team, tIndex) => (
-            <div key={tIndex} className="score-grid">
+            <div key={team.id} className="score-grid">
               <div className="cell team">{team.name}</div>
 
               {SUBJECTS.map(sub => (
@@ -162,7 +210,7 @@ const Round1Page = () => {
             onClick={finishRound1}
             disabled={round1Locked}
           >
-            {round1Locked ? "ROUND 1 FINISHED" : "FINISH ROUND 1"}
+            {round1Locked ? "ROUND 1 SAVED" : "SAVE ROUND 1"}
           </button>
         </div>
 
@@ -177,7 +225,7 @@ const Round1Page = () => {
             </div>
 
             {teams.map((team, i) => (
-              <div key={i} className="round2-row">
+              <div key={team.id} className="round2-row">
                 <span className="team-name">{team.name}</span>
                 <input
                   type="number"
@@ -202,7 +250,7 @@ const Round1Page = () => {
               onClick={finishRound2}
               disabled={round2Locked}
             >
-              {round2Locked ? "ROUND 2 FINISHED" : "FINISH ROUND 2"}
+              {round2Locked ? "ROUND 2 SAVED" : "SAVE ROUND 2"}
             </button>
           </div>
 

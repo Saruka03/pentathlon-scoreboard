@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "../Styles/ScoreboardPage.css";
+import { supabase } from "../lib/supabase";
 
 interface TeamScore {
   teamName: string;
@@ -12,86 +13,96 @@ const QualifierSummaryPage = () => {
   const [teams, setTeams] = useState<TeamScore[]>([]);
 
   useEffect(() => {
-    const r1 =
-      JSON.parse(localStorage.getItem("qualifierRound1Scores") || "[]");
-    const r2 =
-      JSON.parse(localStorage.getItem("qualifierRound2Scores") || "[]");
+    loadSummary();
+  }, []);
 
-    const map = new Map<string, TeamScore>();
+  const loadSummary = async () => {
+    // Get round IDs
+    const { data: q1 } = await supabase
+      .from("rounds")
+      .select("id")
+      .eq("name", "Qualifier 1")
+      .single();
 
-    // ✅ Load Round 1
-    r1.forEach((t: any) => {
-      map.set(t.teamName, {
-        teamName: t.teamName,
-        round1: t.score,
-        round2: 0,
-        total: t.score
-      });
-    });
+    const { data: q2 } = await supabase
+      .from("rounds")
+      .select("id")
+      .eq("name", "Qualifier 2")
+      .single();
 
-    // ✅ Add Round 2
-    r2.forEach((t: any) => {
-      const existing = map.get(t.teamName);
+    if (!q1 || !q2) {
+      alert("Qualifier rounds missing in database");
+      return;
+    }
 
-      if (existing) {
-        existing.round2 = t.score;
-        existing.total = existing.round1 + t.score;
-      } else {
-        map.set(t.teamName, {
-          teamName: t.teamName,
-          round1: 0,
-          round2: t.score,
-          total: t.score
+    // Get team scores
+    const { data: s1 } = await supabase
+      .from("scores")
+      .select("team_id, points")
+      .eq("round_id", q1.id);
+
+    const { data: s2 } = await supabase
+      .from("scores")
+      .select("team_id, points")
+      .eq("round_id", q2.id);
+
+    // Load team names
+    const { data: teamRows } = await supabase
+      .from("teams")
+      .select("id, name");
+
+    const teamMap = new Map<string, TeamScore>();
+
+    // ================= ROUND 1 =================
+    s1?.forEach(row => {
+      const teamName =
+        teamRows?.find(t => t.id === row.team_id)?.name || "Unknown";
+
+      const value = row.points / 100; // ✅ scale back
+
+      const prev = teamMap.get(row.team_id);
+
+      if (!prev) {
+        teamMap.set(row.team_id, {
+          teamName,
+          round1: value,
+          round2: 0,
+          total: value
         });
+      } else {
+        prev.round1 += value;
+        prev.total += value;
       }
     });
 
-    const result = Array.from(map.values()).sort(
+    // ================= ROUND 2 =================
+    s2?.forEach(row => {
+      const teamName =
+        teamRows?.find(t => t.id === row.team_id)?.name || "Unknown";
+
+      const value = row.points / 100; // ✅ scale back
+
+      const prev = teamMap.get(row.team_id);
+
+      if (!prev) {
+        teamMap.set(row.team_id, {
+          teamName,
+          round1: 0,
+          round2: value,
+          total: value
+        });
+      } else {
+        prev.round2 += value;
+        prev.total += value;
+      }
+    });
+
+    const result = Array.from(teamMap.values()).sort(
       (a, b) => b.total - a.total
     );
 
     setTeams(result);
-  }, []);
-
-  useEffect(() => {
-  const r1 =
-    JSON.parse(localStorage.getItem("qualifierRound1Scores") || "[]");
-  const r2 =
-    JSON.parse(localStorage.getItem("qualifierRound2Scores") || "[]");
-  const allTeams =
-    JSON.parse(localStorage.getItem("scoreboard_teams") || "[]");
-
-  const map = new Map<string, any>();
-
-  r1.forEach((t: any) => {
-    map.set(t.teamName, {
-      name: t.teamName,
-      round1: t.score,
-      round2: 0,
-      totalScore: t.score,
-      members:
-        allTeams.find((x: any) => x.name === t.teamName)?.members || []
-    });
-  });
-
-  r2.forEach((t: any) => {
-    const existing = map.get(t.teamName);
-    if (existing) {
-      existing.round2 = t.score;
-      existing.totalScore += t.score;
-    }
-  });
-
-  const finalResults = Array.from(map.values())
-    .sort((a, b) => b.totalScore - a.totalScore);
-
-  // ✅ SAVE FOR ROUND 3
-  localStorage.setItem(
-    "round3Teams",
-    JSON.stringify(finalResults)
-  );
-}, []);
-
+  };
 
   return (
     <div className="team-bg">

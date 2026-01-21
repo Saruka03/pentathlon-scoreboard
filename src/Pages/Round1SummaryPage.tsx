@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../Styles/TeamSetupPage.css";
 import "../Styles/ScoreboardPage.css";
+import { supabase } from "../lib/supabase";
 
 interface TeamSummary {
-  id: number;
+  id: string;
   name: string;
   score: number;
 }
@@ -12,71 +13,82 @@ interface TeamSummary {
 const Round1SummaryPage = () => {
   const navigate = useNavigate();
   const [teams, setTeams] = useState<TeamSummary[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchRound1Summary();
+    loadSummary();
   }, []);
 
-const fetchRound1Summary = () => {
-  const round1 = JSON.parse(
-    localStorage.getItem("round1_scores") || "[]"
-  );
+  const loadSummary = async () => {
+    setLoading(true);
 
-  const round2 = JSON.parse(
-    localStorage.getItem("round2_scores") || "[]"
-  );
+    // 1️⃣ Load teams
+    const { data: teamsData, error: teamsError } = await supabase
+      .from("teams")
+      .select("id, name");
 
-  const setupTeams = JSON.parse(
-    localStorage.getItem("scoreboard_teams") || "[]"
-  );
+    if (teamsError || !teamsData) {
+      alert("Failed to load teams");
+      return;
+    }
 
-  if (!round1.length || !setupTeams.length) return;
+    // 2️⃣ Load scores
+    const { data: scoresData, error: scoresError } = await supabase
+      .from("scores")
+      .select("team_id, points");
 
-  const formatted: TeamSummary[] = round1.map(
-    (r1: any, index: number) => {
-      // ✅ FIXED KEY
-      const setupTeam = setupTeams.find(
-        (t: any) => t.teamName === r1.teamName
+    if (scoresError || !scoresData) {
+      alert("Failed to load scores");
+      return;
+    }
+
+    // 3️⃣ Calculate totals
+    const result: TeamSummary[] = teamsData.map(team => {
+      const teamScores = scoresData.filter(
+        s => s.team_id === team.id
       );
 
-      const r2 = round2.find(
-        (t: any) => t.teamName === r1.teamName
+      const total = teamScores.reduce(
+        (sum, s) => sum + s.points,
+        0
       );
 
       return {
-        id: index,
-        name: setupTeam?.teamName || r1.teamName, // ✅ CORRECT
-        score: r1.total + (r2?.score || 0)
+        id: team.id,
+        name: team.name,
+        score: total
       };
-    }
-  );
+    });
 
-  formatted.sort((a, b) => b.score - a.score);
+    // 4️⃣ Sort by score
+    result.sort((a, b) => b.score - a.score);
 
-  setTeams(formatted);
+    setTeams(result);
+    setLoading(false);
+  };
 
-  localStorage.setItem(
-    "round2Teams",
-    JSON.stringify(formatted.slice(0, 3))
-  );
-};
-
-return (
+  return (
     <div className="team-bg">
       <div className="team-card">
-        <h2 className="team-title">ROUND 1 FINAL SCORES</h2>
+        <h2 className="team-title">ROUND SUMMARY</h2>
 
-        <div className="score-list">
-          {teams.map((team, index) => (
-            <div key={team.id} className="score-row">
-              <div className={`rank-circle rank-${index + 1}`}>
-                {index + 1}
+        {loading ? (
+          <p style={{ textAlign: "center", color: "#fff" }}>
+            Loading summary...
+          </p>
+        ) : (
+          <div className="score-list">
+            {teams.map((team, index) => (
+              <div key={team.id} className="score-row">
+                <div className={`rank-circle rank-${index + 1}`}>
+                  {index + 1}
+                </div>
+                <span className="team-name">{team.name}</span>
+                <span className="team-score">{team.score}</span>
               </div>
-              <span className="team-name">{team.name}</span>
-              <span className="team-score">{team.score}</span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {teams.length > 0 && (
           <button

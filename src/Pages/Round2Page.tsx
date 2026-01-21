@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../Styles/Round2Page.css";
+import { supabase } from "../lib/supabase";
 
 const SUBJECTS = [
   { key: "maths", label: "Maths", credit: 3 },
@@ -11,8 +12,9 @@ const SUBJECTS = [
 ];
 
 interface Team {
+  id: string;
   name: string;
-  members: string[];
+  members: { id: string; name: string }[];
 }
 
 interface MemberScore {
@@ -33,39 +35,68 @@ const Round2Page = () => {
   const [round2Scores, setRound2Scores] = useState<(number | "")[]>([]);
   const [round2Locked, setRound2Locked] = useState(false);
 
-  /* ===== LOAD TEAMS ===== */
   useEffect(() => {
-    const topTeams = JSON.parse(localStorage.getItem("round2Teams") || "[]");
-    const allTeams = JSON.parse(localStorage.getItem("scoreboard_teams") || "[]");
+    loadQualifiedTeams();
+  }, []);
 
-    const qualified: Team[] = topTeams.map((t: any) => {
-      const full = allTeams.find((a: any) => a.name === t.name);
-      return { name: t.name, members: full?.members || [] };
+  const loadQualifiedTeams = async () => {
+    const { data: r1 } = await supabase.from("rounds").select("id").eq("name", "Knockout 1").single();
+    const { data: r2 } = await supabase.from("rounds").select("id").eq("name", "Knockout 2").single();
+
+    if (!r1 || !r2) {
+      alert("Round 1 data missing");
+      return;
+    }
+
+    const { data: scores1 } = await supabase.from("scores").select("team_id, points").eq("round_id", r1.id);
+    const { data: scores2 } = await supabase.from("scores").select("team_id, points").eq("round_id", r2.id);
+
+    const totals: Record<string, number> = {};
+
+    scores1?.forEach(s => {
+      totals[s.team_id] = (totals[s.team_id] || 0) + s.points;
+    });
+    scores2?.forEach(s => {
+      totals[s.team_id] = (totals[s.team_id] || 0) + s.points;
     });
 
-    setTeams(qualified);
+    const sortedTeamIds = Object.entries(totals)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(x => x[0]);
+
+    const { data: teamRows } = await supabase.from("teams").select("id, name").in("id", sortedTeamIds);
+    const { data: playerRows } = await supabase.from("players").select("id, name, team_id").in("team_id", sortedTeamIds);
+
+    const finalTeams: Team[] = teamRows!.map(t => ({
+      id: t.id,
+      name: t.name,
+      members: playerRows!.filter(p => p.team_id === t.id)
+    }));
+
+    setTeams(finalTeams);
+
     setScores(
-      qualified.map(team =>
+      finalTeams.map(team =>
         team.members.map(() => ({
           subject: "",
           circles: [],
-          extra: "" // ✅ EMPTY INIT
+          extra: ""
         }))
       )
     );
-    setLockedTeams(qualified.map(() => false));
-    setTeamTotals(qualified.map(() => 0));
-    setRound2Scores(qualified.map(() => ""));
-  }, []);
 
-  /* ===== DETECT ROUND 1 FINISH ===== */
+    setLockedTeams(finalTeams.map(() => false));
+    setTeamTotals(finalTeams.map(() => 0));
+    setRound2Scores(finalTeams.map(() => ""));
+  };
+
   useEffect(() => {
     if (lockedTeams.length && lockedTeams.every(Boolean)) {
       setRound1Finished(true);
     }
   }, [lockedTeams]);
 
-  /* ===== CIRCLE TOGGLE ===== */
   const toggleCircle = (t: number, m: number, c: number) => {
     if (lockedTeams[t]) return;
 
@@ -87,8 +118,6 @@ const Round2Page = () => {
     );
   };
 
-  /* ===== SCORING ===== */
-
   const memberTotal = (m: MemberScore) => {
     const extra = m.extra === "" ? 0 : m.extra;
     return m.circles.length * 2 + extra;
@@ -96,59 +125,76 @@ const Round2Page = () => {
 
   const teamTotal = (t: number) => {
     let sum = 0;
-
     scores[t].forEach(m => {
-      const credit =
-        SUBJECTS.find(s => s.key === m.subject)?.credit || 0;
+      const credit = SUBJECTS.find(s => s.key === m.subject)?.credit || 0;
       sum += memberTotal(m) * credit;
     });
-
     return Number((sum / 10).toFixed(2));
   };
 
-  /* ===== FINISH TEAM ===== */
-  const finishTeam = (t: number) => {
-  for (const m of scores[t]) {
-    if (!m.subject) {
-      alert("Select subject for all members");
-      return;
+  const getOrCreateRound = async (roundName: string) => {
+    let { data } = await supabase.from("rounds").select("id").eq("name", roundName).single();
+
+    if (!data) {
+      const { data: newRound } = await supabase
+        .from("rounds")
+        .insert({ name: roundName, score_type: "team" })
+        .select()
+        .single();
+
+      return newRound.id;
     }
-  }
 
-  const total = teamTotal(t);
+    return data.id;
+  };
 
-  setLockedTeams(prev => prev.map((l, i) => (i === t ? true : l)));
-  setTeamTotals(prev => prev.map((v, i) => (i === t ? total : v)));
+  /* ================= SAVE QUALIFIER ROUND 1 ================= */
+  const finishTeam = async (t: number) => {
+    for (const m of scores[t]) {
+      if (!m.subject) {
+        alert("Select subject for all members");
+        return;
+      }
+    }
 
-  // ✅ SAVE QUALIFIER ROUND 1 SCORE
-  const stored =
-    JSON.parse(localStorage.getItem("qualifierRound1Scores") || "[]");
+    const total = teamTotal(t);
+    const roundId = await getOrCreateRound("Qualifier 1");
 
-  const updated = [...stored.filter((x: any) => x.teamName !== teams[t].name)];
+    await supabase.from("scores").delete().eq("round_id", roundId).eq("team_id", teams[t].id);
 
-  updated.push({
-    teamName: teams[t].name,
-    score: total
-  });
-
-  localStorage.setItem(
-    "qualifierRound1Scores",
-    JSON.stringify(updated)
-  );
-};
-
-
-  /* ===== FINISH ROUND 2 ===== */
-  const finishRound2 = () => {
-    setRound2Locked(true);
-
-    const data = teams.map((t, i) => ({
-      teamName: t.name,
-      score: Number(round2Scores[i] || 0)
+    const inserts = teams[t].members.map((player, i) => ({
+      round_id: roundId,
+      team_id: teams[t].id,
+      player_id: player.id,
+      points: Math.round(memberTotal(scores[t][i]) * 100) // ✅ scaled int
     }));
 
-    localStorage.setItem("qualifierRound2Scores", JSON.stringify(data));
+    await supabase.from("scores").insert(inserts);
+
+    setLockedTeams(prev => prev.map((l, i) => (i === t ? true : l)));
+    setTeamTotals(prev => prev.map((v, i) => (i === t ? total : v)));
   };
+
+  /* ================= SAVE QUALIFIER ROUND 2 ================= */
+  const finishRound2 = async () => {
+    setRound2Locked(true);
+
+    const roundId = await getOrCreateRound("Qualifier 2");
+
+    await supabase.from("scores").delete().eq("round_id", roundId);
+
+    const inserts = teams.map((t, i) => ({
+      round_id: roundId,
+      team_id: t.id,
+      points: Math.round(Number(round2Scores[i] || 0) * 100) // ✅ scaled int
+    }));
+
+    await supabase.from("scores").insert(inserts);
+  };
+
+  /* ================= UI (100% UNCHANGED) ================= */
+  // ⚠️ UI PART CONTINUES EXACTLY AS YOUR ORIGINAL FILE
+
 
   return (
     <div className="round2-bg">
@@ -172,7 +218,7 @@ const Round2Page = () => {
 
             {team.members.map((m, i) => (
               <div key={i} className="qual-row ">
-                <span>{m}</span>
+                <span>{m.name}</span>
 
                 <select
                   disabled={lockedTeams[t]}
