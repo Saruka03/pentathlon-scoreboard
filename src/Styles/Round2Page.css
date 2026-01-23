@@ -73,39 +73,92 @@
   justify-self: center;
   text-align: center;
 }
+.qualifier-grid.header {
+  column-gap: 0px;   /* 👈 reduce gap between titles */
+}
 
 /* ===============================
    QUALIFIER TABLE
    =============================== */
 
+/* ===== Glass Select (Qualifier Round 1 Subject) ===== */
+
+.subject-select {
+  width: 180px;
+  max-width: 220px;
+  height: 42px;
+  padding: 0 44px 0 18px;
+
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.15),
+      rgba(255, 255, 255, 0.05)
+    );
+  backdrop-filter: blur(10px);
+
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+/* Custom arrow */
+.subject-select {
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5'/%3E%3C/svg%3E"),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.15),
+      rgba(255, 255, 255, 0.05)
+    );
+  background-repeat: no-repeat;
+  background-position: right 16px center, center;
+  background-size: 14px, cover;
+}
+
+/* Hover */
+.subject-select:hover {
+  border-color: rgba(100, 180, 255, 0.7);
+}
+
+/* Focus */
+.subject-select:focus {
+  outline: none;
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+}
+
+/* Disabled */
+.subject-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ===== SHARED GRID FOR HEADER + ROWS ===== */
 /* ===== QUALIFIER TABLE GRID ===== */
+/* Shared grid for header + rows */
 .qualifier-grid,
 .qual-row {
   display: grid;
-  grid-template-columns:
-    200px   /* Name */
-    180px   /* Subject */
-    220px   /* Score */
-    160px   /* Extra */
-    80px;   /* Total */
+  grid-template-columns: 0.3fr 0.6fr 1.0fr 0.6fr 0.4fr;
+  column-gap: 60px;
   align-items: center;
 }
+
 .qualifier-grid > :nth-child(4) {
   justify-self: center;
 }
-.extra-input {
-  width: 120px;
-  box-sizing: border-box;
-  justify-self: center;
-  margin: 0;
-}
 
-.qualifier-table {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
 
 .qualifier-header {
   font-weight: 700;
@@ -128,16 +181,6 @@
 }
 
 .qualifier-row div:not(.name-cell) {
-  text-align: center;
-}
-
-
-/* Header + Row */
-.qual-header,
-.qual-row {
-  display: grid;
-  grid-template-columns: 220px 180px 180px 140px 140px;
-  align-items: center;
   text-align: center;
 }
 
@@ -203,12 +246,12 @@
 .circle-group {
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .circle {
-  width: 14px;
-  height: 14px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   border: 2px solid white;
   cursor: pointer;
@@ -399,53 +442,18 @@
 
   margin-bottom: 18px;
 }
-/* ===============================
-   KNOCKOUT HEADER ROW
-   =============================== */
-.knockout-header {
-  display: grid;
-  grid-template-columns:
-    180px   /* Team */
-    140px   /* Maths */
-    140px   /* Science */
-    120px   /* IT */
-    120px   /* GK */
-    140px   /* Sports */
-    120px;  /* Total */
 
-  align-items: center;
-  text-align: center;
-
-  margin-bottom: 25px;
-  font-weight: 700;
-  font-size: 15px;
-  opacity: 0.9;
-}
 
 /* Team title left aligned */
-.knockout-header .col-team {
-  text-align: left;
-}
-.knockout-row {
-  display: grid;
-  grid-template-columns:
-    180px
-    140px
-    140px
-    120px
-    120px
-    140px
-    120px;
 
-  align-items: center;
-  text-align: center;
-}
 /* ===== FIX EXTRA COLUMN OVERFLOW ===== */
 .extra-input {
   width: 100%;
   max-width: 140px;   /* 🔥 HARD LIMIT */
   box-sizing: border-box;
   justify-self: center;
+  margin: 0 auto;
+  display: block;
 }
 
 .header {
@@ -463,5 +471,34 @@
   text-align: center;
 }
 .qualifier-grid > :nth-child(4) {
+  justify-self: center;
+}
+.qual-row > *:nth-child(1),
+.qualifier-grid.header > *:nth-child(1) {
+  grid-column: 1;
+  justify-self: start;
+}
+.qual-row > *:nth-child(2),
+.qualifier-grid.header > *:nth-child(2) {
+  grid-column: 2;
+  justify-self: center;
+}
+..qual-row > *:nth-child(3),
+.qualifier-grid.header > *:nth-child(3) {
+  grid-column: 3;
+  justify-self: center;
+}
+.qual-row > *:nth-child(4),
+.qualifier-grid.header > *:nth-child(4) {
+  grid-column: 4;
+  justify-self: center;
+}
+
+.extra-input {
+  width: 90px;
+}
+.qual-row > *:nth-child(5),
+.qualifier-grid.header > *:nth-child(5) {
+  grid-column: 5;
   justify-self: center;
 }

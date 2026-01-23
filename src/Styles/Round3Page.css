@@ -70,30 +70,8 @@
 }
 
 /* Circles */
-.buzzer-circles {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
 
-.buzzer-circle {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 2px solid white;
-  cursor: pointer;
-}
 
-/* States */
-.buzzer-circle.green {
-  background: #22c55e;
-  border-color: #22c55e;
-}
-
-.buzzer-circle.red {
-  background: #ef4444;
-  border-color: #ef4444;
-}
 
 /* ===============================
    FINAL SCORE DISPLAY
@@ -108,7 +86,7 @@
 /* Reuse existing finish button */
 .finish-btn.center {
   display: block;
-  margin: 30px auto 0;
+  margin: 50px auto 0;
 }
 
 .center {
@@ -135,14 +113,14 @@
 .finish-btn {
   display: block;
   margin: 15px auto 30px;
-  padding: 10px 25px;
+  padding: 25px 40px;
   border-radius: 20px;
 }
 
 .buzzer-grid {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .buzzer-circle {
@@ -205,20 +183,26 @@
   gap: 10px; /* space between name and box */
 }
 .score-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;               /* equal space between teams */
   justify-content: center;
-  gap: 120px;
-  margin-bottom: 25px;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 20px auto;
 }
 .team-score-col {
   display: flex;
-  flex-direction: column;   /* 🔴 THIS IS THE KEY */
+  flex-direction: column;
   align-items: center;
+  min-height: 120px; /* KEY FIX */
 }
 .team-column {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: center;     /* center align content */
+  text-align: center;
 }
 .team-name {
   color: white;
@@ -237,29 +221,18 @@
   border-radius: 16px;
 }
 .glass-score {
-  width: 120px;
-  height: 40px;
+  width: 130px;
+  height: 52px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.35);
   background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(5px);
   color: white;
   text-align: center;
   font-size: 16px;
   outline: none;
 }
-.buzzer-row select {
-  padding: 10px 18px;
-  border-radius: 999px; /* oval shape */
-  border: none;
-  font-size: 0.95rem;
-  background: white;
-  min-width: 220px;
-  text-align: center;
-}
-.buzzer-row select:hover {
-  box-shadow: 0 0 0 2px rgba(59,130,246,0.6);
-}
+
 /* ===============================
    GLASS SELECT (BUZZER ROUND)
    =============================== */
@@ -272,7 +245,7 @@
   padding: 12px 50px 12px 20px;
   border-radius: 999px;
 
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: white;
 
   background: rgba(255, 255, 255, 0.12);
@@ -320,14 +293,14 @@
   opacity: 0.8;
 }
 .round-finish-btn {
-  margin: 10px auto 30px;
+  margin: 15px auto 30px;
   display: block;
-  padding: 10px 28px;
+  padding: 20px 35px;
   border-radius: 999px;
   border: none;
-  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  background: linear-gradient(135deg, #3c9ff5, #008cfe);
   color: #000;
-  font-weight: 600;
+  font-weight: 900;
   cursor: pointer;
   transition: 0.3s;
 }
@@ -359,13 +332,13 @@ input[type="number"] {
 }
 
 .glass-select option {
-  color: black;
+  color: rgb(58, 71, 71);
 }
 
 .buzzer-container {
   display: flex;
   justify-content: center;
-  gap: 60px;
+  gap: 80px;
 }
 
 /* Team wrapper */
@@ -376,7 +349,7 @@ input[type="number"] {
 
 /* Column that defines alignment */
 .member-column {
-  width: 260px;          /* SAME as select */
+  width: 300px;          /* SAME as select */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -397,4 +370,27 @@ input[type="number"] {
   align-items: center;
   gap: 16px;
   margin-bottom: 14px;
+}
+.round-finish-btn.finished {
+  background: #9ca3af;   /* ash / grey */
+  color: #1f2937;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.round-section {
+  margin-bottom: 60px;
+}
+.teams-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 120px;
+  justify-content: center;
+  align-items: start;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.round-btn-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 25px;
 }

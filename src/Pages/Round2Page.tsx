@@ -221,6 +221,7 @@ const Round2Page = () => {
                 <span>{m.name}</span>
 
                 <select
+                  className="glass-select subject-select"
                   disabled={lockedTeams[t]}
                   value={scores[t][i].subject}
                   onChange={e =>
@@ -235,6 +236,7 @@ const Round2Page = () => {
                     )
                   }
                 >
+
                   <option value="">Select</option>
                   {SUBJECTS.map(s => (
                     <option key={s.key} value={s.key}>

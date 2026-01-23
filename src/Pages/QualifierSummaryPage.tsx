@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "../Styles/ScoreboardPage.css";
+import "../Styles/Round1SummaryPage.css";
 import { supabase } from "../lib/supabase";
 
 interface TeamScore {
@@ -111,16 +111,18 @@ const QualifierSummaryPage = () => {
 
         <div className="score-list">
           {teams.map((team, index) => (
-            <div key={team.teamName} className="score-row">
-              <div className={`rank-circle rank-${index + 1}`}>
+            <div key={team.teamName} className={`leader-row rank-${index + 1}`}>
+              <div className="avatar">
                 {index + 1}
               </div>
-
-              <span className="team-name">{team.teamName}</span>
-
+              <div className="leader-content">
+                  <span className="leader-name">{team.teamName}</span>
+              </div>
+              <div className="leader-score">
               <span className="team-score">
                 {team.total.toFixed(2)}
               </span>
+              </div>
             </div>
           ))}
         </div>

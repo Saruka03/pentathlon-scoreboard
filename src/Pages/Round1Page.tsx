@@ -142,7 +142,7 @@ const Round1Page = () => {
     const inserts = teams.map((team, index) => ({
       round_id: roundId,
       team_id: team.id,
-      points: Number(round2Scores[index] || 0)
+      points: Math.round(Number(round2Scores[index] || 0) * 100)
     }));
 
     await supabase.from("scores").insert(inserts);

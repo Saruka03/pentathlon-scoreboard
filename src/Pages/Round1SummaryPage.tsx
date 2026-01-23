@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../Styles/TeamSetupPage.css";
-import "../Styles/ScoreboardPage.css";
+import "../Styles/Round1SummaryPage.css";
 import { supabase } from "../lib/supabase";
 
 interface TeamSummary {
@@ -56,7 +55,7 @@ const Round1SummaryPage = () => {
       return {
         id: team.id,
         name: team.name,
-        score: total
+         score: Number((total / 100).toFixed(2))
       };
     });
 
@@ -70,7 +69,7 @@ const Round1SummaryPage = () => {
   return (
     <div className="team-bg">
       <div className="team-card">
-        <h2 className="team-title">ROUND SUMMARY</h2>
+        <h2 className="team-title">KNOCK OUT ROUND</h2>
 
         {loading ? (
           <p style={{ textAlign: "center", color: "#fff" }}>
@@ -79,26 +78,23 @@ const Round1SummaryPage = () => {
         ) : (
           <div className="score-list">
             {teams.map((team, index) => (
-              <div key={team.id} className="score-row">
-                <div className={`rank-circle rank-${index + 1}`}>
+              <div key={team.id} className={`leader-row rank-${index + 1}`}>
+                <div className="avatar">
                   {index + 1}
                 </div>
-                <span className="team-name">{team.name}</span>
-                <span className="team-score">{team.score}</span>
+                <div className="leader-content">
+                  <span className="leader-name">{team.name}</span>
+                  
+                </div>
+                <div className="leader-score">
+                  {team.score}
+                </div>
               </div>
             ))}
           </div>
         )}
 
-        {teams.length > 0 && (
-          <button
-            className="action-btn"
-            style={{ marginTop: 40 }}
-            onClick={() => navigate("/round2")}
-          >
-            GO TO QUALIFIER ROUND
-          </button>
-        )}
+        
       </div>
     </div>
   );

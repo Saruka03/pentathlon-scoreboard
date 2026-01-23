@@ -214,7 +214,9 @@ const Round3Page = () => {
         <h2 className="final-round-title">Final Round</h2>
 
         <h3 className="round-title">Find the Great Mind</h3>
-        <div className="score-row">
+        <div className="round-section">
+
+        <div className="teams-grid">
           <div className="team-column">
             <span className="team-name">{team1.name}</span>
             <input
@@ -242,49 +244,61 @@ const Round3Page = () => {
           </div>
         </div>
 
-        <button
-          className="round-finish-btn"
-          onClick={() => setRound1Finished(true)}
-        >
-          Finish Round
-        </button>
-
-        <h3 className="round-title">Puzzle Round</h3>
-        <div className="score-row">
-          <div className="team-column">
-            <span className="team-name">{team1.name}</span>
-            <input
-              className="glass-score"
-              type="number"
-              value={round2.t1}
-              onChange={e =>
-                setRound2({ ...round2, t1: Number(e.target.value) || "" })
-              }
-              disabled={round2Finished}
-            />
-          </div>
-
-          <div className="team-column">
-            <span className="team-name">{team2.name}</span>
-            <input
-              className="glass-score"
-              type="number"
-              value={round2.t2}
-              onChange={e =>
-                setRound2({ ...round2, t2: Number(e.target.value) || "" })
-              }
-              disabled={round2Finished}
-            />
-          </div>
+        <div className="round-btn-row">
+          <button
+            className={`round-finish-btn ${round1Finished ? "finished" : ""}`}
+            onClick={() => setRound1Finished(true)}
+            disabled={round1Finished}
+          >
+            {round1Finished ? "Finished" : "Finish Round"}
+          </button>
         </div>
 
-        <button
-          className="round-finish-btn"
-          onClick={() => setRound2Finished(true)}
-        >
-          Finish Round
-        </button>
+      </div>
 
+
+        <h3 className="round-title">Puzzle Round</h3>
+        <div className="round-section">
+
+          <div className="teams-grid">
+            <div className="team-column">
+              <span className="team-name">{team1.name}</span>
+              <input
+                className="glass-score"
+                type="number"
+                value={round1.t1}
+                onChange={e =>
+                  setRound1({ ...round1, t1: Number(e.target.value) || "" })
+                }
+                disabled={round1Finished}
+              />
+            </div>
+
+            <div className="team-column">
+              <span className="team-name">{team2.name}</span>
+              <input
+                className="glass-score"
+                type="number"
+                value={round1.t2}
+                onChange={e =>
+                  setRound1({ ...round1, t2: Number(e.target.value) || "" })
+                }
+                disabled={round1Finished}
+              />
+            </div>
+          </div>
+
+          <div className="round-btn-row">
+            <button
+              className={`round-finish-btn ${round1Finished ? "finished" : ""}`}
+              onClick={() => setRound1Finished(true)}
+              disabled={round1Finished}
+            >
+              {round1Finished ? "Finished" : "Finish Round"}
+            </button>
+          </div>
+
+        </div>
         <h3 className="round-title">Buzzer Round</h3>
 
 <div className="buzzer-container">
