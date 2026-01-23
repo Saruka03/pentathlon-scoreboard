@@ -230,18 +230,6 @@ const Round3Page = () => {
             />
           </div>
 
-          <div className="team-column">
-            <span className="team-name">{team2.name}</span>
-            <input
-              className="glass-score"
-              type="number"
-              value={round1.t2}
-              onChange={e =>
-                setRound1({ ...round1, t2: Number(e.target.value) || "" })
-              }
-              disabled={round1Finished}
-            />
-          </div>
         </div>
 
         <div className="round-btn-row">
@@ -266,35 +254,22 @@ const Round3Page = () => {
               <input
                 className="glass-score"
                 type="number"
-                value={round1.t1}
+                value={round2.t1}
                 onChange={e =>
-                  setRound1({ ...round1, t1: Number(e.target.value) || "" })
+                  setRound2({ ...round2, t1: Number(e.target.value) || "" })
                 }
-                disabled={round1Finished}
-              />
-            </div>
-
-            <div className="team-column">
-              <span className="team-name">{team2.name}</span>
-              <input
-                className="glass-score"
-                type="number"
-                value={round1.t2}
-                onChange={e =>
-                  setRound1({ ...round1, t2: Number(e.target.value) || "" })
-                }
-                disabled={round1Finished}
+                disabled={round2Finished}
               />
             </div>
           </div>
 
           <div className="round-btn-row">
             <button
-              className={`round-finish-btn ${round1Finished ? "finished" : ""}`}
-              onClick={() => setRound1Finished(true)}
-              disabled={round1Finished}
+              className={`round-finish-btn ${round2Finished ? "finished" : ""}`}
+              onClick={() => setRound2Finished(true)}
+              disabled={round2Finished}
             >
-              {round1Finished ? "Finished" : "Finish Round"}
+              {round2Finished ? "Finished" : "Finish Round"}
             </button>
           </div>
 

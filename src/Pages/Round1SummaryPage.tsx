@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import "../Styles/Round1SummaryPage.css";
 import { supabase } from "../lib/supabase";
 
@@ -10,9 +10,10 @@ interface TeamSummary {
 }
 
 const Round1SummaryPage = () => {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const [teams, setTeams] = useState<TeamSummary[]>([]);
   const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     loadSummary();

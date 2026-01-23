@@ -207,7 +207,7 @@ const Round2Page = () => {
             <h3 style={{ textAlign: "left" }}>{team.name}</h3>
 
             <div className="qualifier-grid header">
-              <div className="cell team">Name</div>
+              <div className="cell ">Name</div>
               <div className="cell">Subject</div>
               <div className="cell">Score</div>
               <span className="cell">Extra</span>

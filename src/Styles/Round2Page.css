@@ -246,12 +246,12 @@
 .circle-group {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .circle {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   border: 2px solid white;
   cursor: pointer;
@@ -483,7 +483,7 @@
   grid-column: 2;
   justify-self: center;
 }
-..qual-row > *:nth-child(3),
+.qual-row > *:nth-child(3),
 .qualifier-grid.header > *:nth-child(3) {
   grid-column: 3;
   justify-self: center;

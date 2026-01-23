@@ -19,7 +19,11 @@
   letter-spacing: 2px;
   text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
-
+.cell{
+  font-size: 20px;
+  font-weight:100px;
+  color: white;
+}
 
 /* GLASS CARD */
 .round1-card {
@@ -82,17 +86,27 @@
   justify-content: center;
   gap: 10px;
 }
-.circle {
+/* Base circle */
+.circle-r1 {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 2px solid #555;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.circle.active {
-  background-color: #555;
+/* Active (clicked) state */
+.circle-r1.active {
+  background: #22c55e;        /* ✅ green */
+  border-color: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
 }
+.circle-r1:hover {
+  transform: scale(1.15);
+}
+
 
 /* Total column */
 .total {
@@ -135,6 +149,7 @@
   grid-template-columns: 180px 1fr 140px;
   align-items: center;
   gap: 0;
+  align-items: center;
 }
 
 .round2-row input {
@@ -222,8 +237,8 @@
     160px   /* Team */
     180px   /* Maths */
     180px   /* Science */
-    140px   /* IT */
-    140px   /* GK */
+    180px   /* IT */
+    180px   /* GK */
     180px   /* Sports */
     100px;  /* Total */
 

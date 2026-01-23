@@ -10,7 +10,7 @@
 
 /* 🔥 GLASS CARD */
 .team-card {
-  width: 460px;
+  width: 900px;
   padding: 42px;
   border-radius: 22px;
 
@@ -29,45 +29,62 @@
 
 /* TITLES */
 .team-title {
-  color: #ffffff;
-  margin-bottom: 10px;
-  letter-spacing: 3px;
-  font-size: 22px;
+  font-size: 50px;
+  font-weight: 800;
+  text-align: center;
+  color: white;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
-
 .subtitle {
   color: #cbd5f5;
   margin-bottom: 22px;
 }
 
 /* INPUT CONTAINER */
+/* Glass-style pill input */
+.team-input {
+  width: 100%;
+  max-width: 600px;
+  padding: 20px 40px;
+
+  border-radius: 999px; /* pill shape */
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  background: rgba(255, 255, 255, 0.15); /* glass effect */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  color: #fff;
+  font-size: 16px;
+
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+/* Placeholder style */
+.team-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Hover */
+.team-input:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Focus glow */
+.team-input:focus {
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.25);
+}
 .team-inputs {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-}
-
-/* 🔥 LONG INPUT BARS */
-.team-input {
-  width: 100%;
-  height: 46px;
-  padding: 0 18px;
-
-  border-radius: 14px;
-  border: none;
-  outline: none;
-
-  font-size: 16px;
-  background: rgba(255, 255, 255, 0.95);
-  color: #020617;
-}
-
-.team-input::placeholder {
-  color: #64748b;
-}
-
-.team-input:focus {
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.6);
+  align-items: center;   /* 👈 centers inputs horizontally */
+  gap: 22px;
 }
 
 /* BUTTON */

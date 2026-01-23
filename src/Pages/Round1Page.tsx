@@ -182,7 +182,7 @@ const Round1Page = () => {
                     {[0, 1, 2, 3, 4].map(c => (
                       <div
                         key={c}
-                        className={`circle ${
+                        className={`circle-r1 ${
                           scores[tIndex]?.[sub.key]?.includes(c)
                             ? "active"
                             : ""
@@ -220,8 +220,8 @@ const Round1Page = () => {
 
           <div className="round2-table">
             <div className="round-header">
-              <span>Team</span>
-              <span>Score</span>
+              <span className="cell">Team</span>
+              <span className="cell">Score</span>
             </div>
 
             {teams.map((team, i) => (

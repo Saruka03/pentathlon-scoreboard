@@ -26,10 +26,14 @@
 
 /* TITLE */
 .score-title {
-  color: white;
-  font-size: 42px;
+  font-size: 60px;
+  font-weight: 600;
   text-align: center;
-  margin-bottom: 40px;
+  color: white;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 /* LIST */
@@ -78,8 +82,8 @@
 }
 /* TEXT */
 .team-name {
-  font-size: 100px;     /* 👈 bigger */
-  font-weight: 1200;    /* 👈 bolder */
+  font-size: 200px;     /* 👈 bigger */
+  font-weight: 1800;    /* 👈 bolder */
   letter-spacing: 0.5px;
 }
 
